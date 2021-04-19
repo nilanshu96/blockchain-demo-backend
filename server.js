@@ -7,6 +7,14 @@ const PORT = 3001;
 const app = express();
 
 app.use(express.json());
+
+//cors policy for API
+app.use((req,res,next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+})
  
 app.get("/", (req, res) => {
     res.send('Blockchain backend');
@@ -14,8 +22,8 @@ app.get("/", (req, res) => {
 
 app.post("/generateBlock", (req, res) => {
 
-    const {data, prevHash} = req.body;
-    return res.json(generateBlock(data, prevHash));
+    const {data, prevHash, prevIdx} = req.body;
+    return res.json(generateBlock(data, prevHash, prevIdx));
 })
 
 app.listen(PORT, () => {
