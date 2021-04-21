@@ -2,24 +2,45 @@ const crypto = require('crypto');
 
 function calculateHash(data) {
     return crypto
-    .createHash("sha256")
-    .update(data)
-    .digest("hex");
+        .createHash("sha256")
+        .update(data)
+        .digest("hex");
 }
 
 function hasThreeLeadingZeros(hash) {
-    if(!hash) return false;
-    return "000" === String(hash).slice(0,3);
+    if (!hash) return false;
+    return "000" === String(hash).slice(0, 3);
 }
 
-function generateBlock(data, prevHash, prevIdx) {
+function generateBlock(data, prevHash, nonce, idx) {
     const blockData = String(data);
-    let nonce = 0;
+
+    let newIsValid = true;
+    const hash = calculateHash(blockData + prevHash + nonce);
+
+    if (!hasThreeLeadingZeros(hash)) {
+        newIsValid = false;
+    }
+
+    return {
+        data: data,
+        idx: idx,
+        prevHash: prevHash,
+        hash: hash,
+        nonce: nonce,
+        isValid: newIsValid,
+        createdAt: new Date().toISOString()
+    }
+}
+
+function generateValidBlock(data, prevHash, prevIdx) {
+    const blockData = String(data);
+    let nonce = -1;
     let hash = null;
 
-    while(!hasThreeLeadingZeros(hash)) {
-        hash = calculateHash(blockData+prevHash+nonce);
+    while (!hasThreeLeadingZeros(hash)) {
         nonce++;
+        hash = calculateHash(blockData + prevHash + nonce);
     }
 
     return {
@@ -34,5 +55,6 @@ function generateBlock(data, prevHash, prevIdx) {
 }
 
 module.exports = {
-    generateBlock
+    generateBlock,
+    generateValidBlock
 }

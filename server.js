@@ -1,6 +1,6 @@
 const express = require('express');
 
-const {generateBlock} = require('./block-chain');
+const {generateBlock, generateValidBlock} = require('./block-chain');
 
 const PORT = 3001;
 
@@ -20,10 +20,16 @@ app.get("/", (req, res) => {
     res.send('Blockchain backend');
 })
 
-app.post("/generateBlock", (req, res) => {
+app.post("/generateValidBlock", (req, res) => {
 
     const {data, prevHash, prevIdx} = req.body;
-    return res.json(generateBlock(data, prevHash, prevIdx));
+    return res.json(generateValidBlock(data, prevHash, prevIdx));
+})
+
+app.post("/generateBlock", (req, res) => {
+
+    const {data, prevHash, nonce, idx} = req.body;
+    return res.json(generateBlock(data, prevHash, nonce, idx));
 })
 
 app.listen(PORT, () => {
